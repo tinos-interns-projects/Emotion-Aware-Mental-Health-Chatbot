@@ -47,6 +47,8 @@ Designed to provide **mental health support** and **real-time conversations**.
 
 ## 📂 Project Structure  
 
+```bash
+
 ├── Bot/
 
 │ ├── static/voice/ # Saved voice files
@@ -66,7 +68,7 @@ Designed to provide **mental health support** and **real-time conversations**.
 ├── manage.py
 
 └── requirements.txt
-
+```
 
 
 ---
