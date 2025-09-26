@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Chatbot</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: url("{% static 'image/polygon-pictures.jpg' %}") no-repeat center center/cover;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        /* Optional dark overlay to make login form pop */
+        
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: -1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container">
+        <h2>Login</h2>
+
+        {% if messages %}
+        <center>
+            {% for msg in messages %}
+            <div class="flash-message">{{ msg }}</div>
+            {% endfor %}
+        </center>
+        {% endif %}
+
+        <script>
+            // Hide flash message after 1 second
+            setTimeout(function() {
+                document.querySelectorAll('.flash-message').forEach(function(el) {
+                    el.style.display = 'none';
+                });
+            }, 3000);
+        </script>
+
+        <form method="POST">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+
+        <div class="link">
+            Don't have an account? <a href="{% url 'register' %}">Register</a>
+        </div>
+    </div>
+</body>
+
+</html>

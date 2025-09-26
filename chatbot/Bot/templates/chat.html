@@ -1,0 +1,155 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chat - Emotion-Aware Chatbot</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <script src="{% static 'script.js' %}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+
+<body>
+
+
+    <div class="header">
+        <h1>Emotion-Aware Chatbot</h1>
+    </div>
+
+
+
+    <div id="menuIcon" onclick="toggleSidebar()" style="position: fixed; top: 20px; left: 20px; z-index: 10000; cursor: pointer;">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <!-- <hr> form create and newpage clicktime create new page its go to chat -->
+        <form action="{% url 'chat' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="new-chat-btn">+ New Chat</button>
+        </form>
+        <hr>
+        <div class="page-list">
+            <h3>Your Chat Pages</h3>
+            <ul>
+                {% for p in page_list %}
+                <li class="chat-page-item{% if p == current_page %} active{% endif %}" data-page="{{ p }}">
+                    <div class="page-content">
+                        <a href="{% url 'chat_page_with_page' p %}" class="page-link">Chat Page {{ p }}</a>
+                        <button type="button" class="dots-btn" tabindex="0">&#8230;</button>
+                        <div class="dropdown-menu" style="display:none;">
+                            <form method="post" action="{% url 'delete_chat' p %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-delete-btn">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- Profile Link -->
+    <div class="profile-link" id="profile-link">
+        <div class="profile-icon">
+            {% if request.user.profile.image %}
+            <img src="{{ request.user.profile.image.url }}" alt="Profile"> {% else %}
+            <div class="profile-initial">
+                {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Profile Dropdown -->
+    <div class="profile-dropdown" id="profile-dropdown" style="display:none;">
+        <div class="profile-picture">
+            {{ request.user.first_name|default:request.user.username|slice:":1"|upper }}
+        </div>
+        <br>
+        <p><strong>Name:</strong> {{ request.user.first_name|default:request.user.username }}</p>
+        <br>
+        <p><strong>Email:</strong> {{ request.user.email }}</p>
+        <br>
+        <hr>
+
+        <form method="post" action="{% url 'clear_history' %}">
+            {% csrf_token %}
+            <button type="submit">Clear Chat History</button>
+        </form>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
+
+        <!-- Global Translate Button -->
+
+    </div>
+
+    {% if messages %}
+    <center>
+        {% for msg in messages %}
+        <div class="flash-message">{{ msg }}</div>
+        {% endfor %}
+    </center>
+    {% endif %}
+
+
+    <!-- Translate Chat Form -->
+    <form method="post" action="{% url 'translate_chat' %}" class="translate-form">
+        {% csrf_token %}
+        <select name="lang" onchange="this.form.submit()">
+        <option value="en" {% if selected_lang == "en" %}selected{% endif %}>English</option>
+        <option value="ml" {% if selected_lang == "ml" %}selected{% endif %}>Malayalam</option>
+        <option value="hi" {% if selected_lang == "hi" %}selected{% endif %}>Hindi</option>
+        <option value="ta" {% if selected_lang == "ta" %}selected{% endif %}>Tamil</option>
+        <option value="kn" {% if selected_lang == "kn" %}selected{% endif %}>Kannada</option>
+        <option value="original">Show Original</option>
+    </select>
+    </form>
+    <!-- Chat Container -->
+    <div class="container">
+        <div id="chat-box">
+            {% for msg in history %}
+            <div class="message {% if msg.is_bot %}bot-msg{% else %}user-msg{% endif %}">
+                <span class="msg-text" data-original="{{ msg.message }}">{{ msg.message }}</span> {% if msg.is_bot %}
+                <button type="button" class="read-btn" data-message="{{ msg.message }}" style="background:none; border:none; cursor:pointer; padding:0; vertical-align:middle;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M16 9C16.5 9.5 17 10.5 17 12C17 13.5 16.5 14.5 16 15M19 6C20.5 7.5 21 10 21 12C21 14 20.5 16.5 19 18M13 3L7 8H5C3.89543 8 3 8.89543 3 10V14C3 15.1046 3.89543 16 5 16H7L13 21V3Z"/>
+                    </svg>
+                </button> {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Input Box -->
+        <form id="chat-form" action="{% url 'get_bot_response' %}" method="post">
+            {% csrf_token %}
+            <div id="input-box">
+                <input type="text" id="user-input" name="user_input" placeholder="Type your message..." autocomplete="off" required value="{{ user_input|default:'' }}">
+                <button type="submit">Send</button>
+                <button type="button" id="record-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                    </svg>
+                </button>
+                <span id="record-timer" style="margin-left:10px;"></span>
+            </div>
+        </form>
+    </div>
+
+
+
+</body>
+
+</html>
