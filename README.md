@@ -91,10 +91,8 @@ venv\Scripts\activate      # Windows
 ### 3.Install Dependencies
 ```bash
 pip install -r requirements.txt
-
-###4.Install Ollama (LLM Backend)
 ```
-
+### 4.Install Ollama (LLM Backend)
 After installation, pull the required model (example: llama2 or custom model):
 
 
