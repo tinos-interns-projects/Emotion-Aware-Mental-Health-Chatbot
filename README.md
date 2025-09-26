@@ -77,34 +77,35 @@ Designed to provide **mental health support** and **real-time conversations**.
 ```bash
 git clone https://github.com/tinos-interns-projects/emotion-aware-chatbot.git
 cd emotion-aware-chatbot
+```
 
-
-###2. Create Virtual Environment
-
+### 2. Create Virtual Environment
+```bash
 python -m venv venv
 
 source venv/bin/activate   # Mac/Linux
 
 venv\Scripts\activate      # Windows
+```
 
-
-###3.Install Dependencies
-
+### 3.Install Dependencies
+```bash
 pip install -r requirements.txt
 
 ###4.Install Ollama (LLM Backend)
+```
 
 After installation, pull the required model (example: llama2 or custom model):
 
 
 
-bash
----
+```bash
 ollama pull llama2
 
 python manage.py migrate
 
 python manage.py runserver
+```
 
 
 ## ▶️ Usage  
