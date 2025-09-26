@@ -78,7 +78,7 @@ Designed to provide **mental health support** and **real-time conversations**.
 git clone https://github.com/tinos-interns-projects/emotion-aware-chatbot.git
 cd emotion-aware-chatbot
 
-```
+
 ###2. Create Virtual Environment
 
 python -m venv venv
